@@ -16,19 +16,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from .scrapers.mock_scraper import MockGroceryScraper, MockFastFoodScraper
-from .scrapers.walmart import WalmartScraper
-from .scrapers.jack_in_the_box import JackInTheBoxScraper
-from .scrapers.safeway import SafewayScraper
-from .scrapers.whole_foods import WholeFoodsScraper
-from .scrapers.target import TargetScraper
-from .scrapers.costco import CostcoScraper
-from .scrapers.trader_joes import TraderJoesScraper
-from .scrapers.mcdonalds import McDonaldsScraper
-from .scrapers.taco_bell import TacoBellScraper
-from .scrapers.starbucks import StarbucksScraper
-from .scrapers.chipotle import ChipotleScraper
-from .nutrition_service import NutritionService
+from scrapers.mock_scraper import MockGroceryScraper, MockFastFoodScraper
+from scrapers.walmart import WalmartScraper
+from scrapers.jack_in_the_box import JackInTheBoxScraper
+from scrapers.safeway import SafewayScraper
+from scrapers.whole_foods import WholeFoodsScraper
+from scrapers.target import TargetScraper
+from scrapers.costco import CostcoScraper
+from scrapers.trader_joes import TraderJoesScraper
+from scrapers.mcdonalds import McDonaldsScraper
+from scrapers.taco_bell import TacoBellScraper
+from scrapers.starbucks import StarbucksScraper
+from scrapers.chipotle import ChipotleScraper
+from nutrition_service import NutritionService
 from typing import List
 
 @app.get("/")
@@ -101,10 +101,10 @@ def search_items(q: str):
 
 # --- New Best Value Endpoints ---
 
-from .smart_pantry import update_benchmarks
-from .database import get_db, engine
-from .models import Base, BenchmarkItem
-from .analysis_engine import AnalysisEngine
+from smart_pantry import update_benchmarks
+from database import get_db, engine
+from models import Base, BenchmarkItem
+from analysis_engine import AnalysisEngine
 from sqlalchemy.orm import Session
 from fastapi import Depends, BackgroundTasks
 

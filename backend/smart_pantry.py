@@ -1,12 +1,12 @@
 from typing import List, Dict
 import logging
 from sqlalchemy.orm import Session
-from .models import BenchmarkItem
-from .scrapers.walmart import WalmartScraper
-from .scrapers.safeway import SafewayScraper
-from .scrapers.trader_joes import TraderJoesScraper
-from .nutrition_service import NutritionService
-from .analysis_engine import AnalysisEngine
+from models import BenchmarkItem
+from scrapers.walmart import WalmartScraper
+from scrapers.safeway import SafewayScraper
+from scrapers.trader_joes import TraderJoesScraper
+from nutrition_service import NutritionService
+from analysis_engine import AnalysisEngine
 
 # List of high-efficiency staple items to track for benchmarking
 STAPLE_ITEMS: List[Dict[str, str]] = [

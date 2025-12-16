@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, JSON, DateTime, Enum
 from sqlalchemy.sql import func
 import enum
-from .database import Base
+from database import Base
 
 class ItemType(str, enum.Enum):
     grocery = "grocery"

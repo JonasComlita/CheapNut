@@ -1,5 +1,5 @@
 from typing import Dict, Any, List
-from .models import BenchmarkItem
+from models import BenchmarkItem
 
 class AnalysisEngine:
     @staticmethod

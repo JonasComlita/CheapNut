@@ -3,11 +3,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-# Use the credentials from docker-compose.yml
-SQLALCHEMY_DATABASE_URL = "postgresql://user:password@localhost/cheapnut"
+# Use SQLite for local development
+SQLALCHEMY_DATABASE_URL = "sqlite:///./cheapnut.db"
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
