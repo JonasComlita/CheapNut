@@ -98,3 +98,87 @@ def search_items(q: str):
             item["nutrition"] = nutrition_service.get_nutrition(clean_name)
 
     return results
+
+# --- New Best Value Endpoints ---
+
+from .smart_pantry import update_benchmarks
+from .database import get_db, engine
+from .models import Base, BenchmarkItem
+from .analysis_engine import AnalysisEngine
+from sqlalchemy.orm import Session
+from fastapi import Depends, BackgroundTasks
+
+# Ensure tables exist (dev convenience)
+Base.metadata.create_all(bind=engine) 
+
+@app.post("/api/benchmarks/refresh")
+def refresh_benchmarks(background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    """
+    Triggers a background task to update staple prices.
+    """
+    background_tasks.add_task(update_benchmarks, db)
+    return {"message": "Benchmark update started in background"}
+
+@app.get("/api/benchmarks/leaderboard")
+def get_leaderboard(metric: str = "protein_per_dollar", db: Session = Depends(get_db)):
+    """
+    Returns top items sorted by the requested metric.
+    Metric options: protein_per_dollar, calories_per_dollar, lowest_price
+    """
+    # Map friendly query param to column
+    metric_map = {
+        "protein": BenchmarkItem.protein_per_dollar,
+        "calories": BenchmarkItem.calories_per_dollar,
+        "price": BenchmarkItem.lowest_price
+    }
+    
+    sort_col = metric_map.get(metric, BenchmarkItem.protein_per_dollar)
+    
+    # Sort Descending for value, Ascending for price?
+    # Usually we want "More per dollar" -> Descending
+    if metric == "price":
+        items = db.query(BenchmarkItem).order_by(sort_col.asc()).limit(10).all()
+    else:
+        items = db.query(BenchmarkItem).order_by(sort_col.desc()).limit(10).all()
+        
+    return items
+
+@app.get("/api/compare/opportunity-cost")
+def compare_item(query: str, db: Session = Depends(get_db)):
+    """
+    Compares a fast food query against the 'best' protein benchmark.
+    """
+    # 1. Get Fast Food Info
+    # Use generic scrapers or mock for now
+    # Ideally reuse the search_items logic but strictly for 1 item
+    pass  # To be implemented cleanly, reusing search logic or a new helper
+
+    # Reuse the search function logic? Or create a helper.
+    # Let's instantiate a quick scraper or use the existing 'search_items' logic if refactored.
+    # For MVP, let's just do a quick McDonald's search
+    
+    mcd = McDonaldsScraper(headless=True)
+    results = mcd.search(query)
+    mcd.driver.quit()
+    
+    if not results:
+        return {"error": "Item not found"}
+        
+    target_item = results[0]  # Take top result
+    
+    # Enrich
+    nut_service = NutritionService()
+    target_item["nutrition"] = nut_service.get_nutrition(target_item["name"])
+    
+    # 2. Get Benchmark
+    # Compare against best protein per dollar item
+    benchmark = db.query(BenchmarkItem).order_by(BenchmarkItem.protein_per_dollar.desc()).first()
+    
+    if not benchmark:
+        return {"error": "No benchmarks available. Run refresh first."}
+        
+    # 3. Calculate
+    analysis = AnalysisEngine.calculate_opportunity_cost(target_item, benchmark)
+    
+    return analysis
+

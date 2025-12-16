@@ -39,3 +39,20 @@ class Comparison(Base):
     nutrition_diff = Column(JSON)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class BenchmarkItem(Base):
+    __tablename__ = "benchmark_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True) # e.g. "Frozen Green Beans"
+    lowest_price = Column(Float)
+    unit = Column(String) # e.g. "lb"
+    store = Column(String) # e.g. "Walmart"
+    
+    # Normalized metrics for comparison
+    price_per_100g = Column(Float)
+    calories_per_dollar = Column(Float)
+    protein_per_dollar = Column(Float)
+    
+    last_updated = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+

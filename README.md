@@ -1,27 +1,36 @@
 # CheapNut
 
-CheapNut is a comprehensive grocery price comparison and nutrition analysis tool. It allows users to search for products, compare prices across different grocery stores (starting with Trader Joe's), and view detailed nutritional information sourced from OpenFoodFacts.
+CheapNut is a comprehensive "Best Nutrition Per Dollar" analysis engine. It goes beyond simple price comparison by calculating the nutritional density of foods per dollar spent, helping users identify the most efficient ways to fuel their bodies. It also features a "Value Opportunity" calculator that compares fast food purchases against high-efficiency staples.
 
-## Features
+## Key Features
 
-- **Store Price Comparison:** Real-time web scraping to get current prices from major grocery chains.
-- **Nutritional Info:** Automatic integration with OpenFoodFacts to provide calories, macronutrients (protein, carbs, fat), and vitamins for searched items.
-- **Real-time Scraping:** Built using Selenium to handle dynamic store websites effectively.
-- **Modern Frontend:** Fast and responsive user interface built with React and Vite.
+- **🏆 Best Value Leaderboard:**
+    - continuously updated ranking of foods with the highest Protein Per Dollar and Calories Per Dollar.
+    - Powered by a "Smart Pantry" engine that scrapes real-time prices for high-efficiency staples (Lentils, Frozen Veggies, Eggs, etc.).
+  
+- **🍔 Value Opportunity Calculator:**
+    - Input a fast food item (e.g. "Big Mac") and see the "Opportunity Cost".
+    - Visualizes how much *more* nutrition (protein, volume, calories) you could have purchased for the same price using Smart Pantry staples.
+
+- **🛒 Multi-Store Scraping:**
+    - Real-time Selenium scrapers for Walmart, Safeway, Trader Joe's, and major fast food chains.
+    - Automatic integration with OpenFoodFacts for nutritional data.
+
+- **📊 Data Visualization:**
+    - Interactive charts powered by `Recharts` to visualize value density and comparisons.
 
 ## Tech Stack
 
-- **Frontend:** React, Vite
-- **Backend:** Python
-- **Scraping:** Selenium, Beautiful Soup (planned)
-- **Data Source:** OpenFoodFacts API
+- **Frontend:** React, Vite, TailwindCSS, Recharts
+- **Backend:** Python (FastAPI), SQLAlchemy, Selenium
+- **Data Source:** OpenFoodFacts API, Direct Store Scraping
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- Python (v3.8 or higher)
+- Node.js (v18+)
+- Python (v3.10+)
 - Chrome/Chromium (for Selenium scraping)
 
 ### Installation
@@ -33,37 +42,38 @@ CheapNut is a comprehensive grocery price comparison and nutrition analysis tool
     ```
 
 2.  **Frontend Setup:**
-    Navigate to the frontend directory and install dependencies:
     ```bash
     cd frontend
     npm install
     ```
 
 3.  **Backend Setup:**
-    Navigate to the backend directory and ensure you have the necessary Python packages installed:
     ```bash
     cd backend
-    # It allows you to create a virtual environment first
     python -m venv venv
     source venv/bin/activate  # On Windows: venv\Scripts\activate
-    pip install -r requirements.txt # If requirements.txt exists, otherwise install manually:
-    pip install selenium requests
+    pip install -r requirements.txt
     ```
 
 ## Usage
 
-1.  **Start the Frontend:**
+1.  **Start the Backend:**
+    ```bash
+    cd backend
+    uvicorn main:app --reload
+    ```
+    *The API will start at http://localhost:8000*
+
+2.  **Start the Frontend:**
     ```bash
     cd frontend
     npm run dev
     ```
+    *The App will start at http://localhost:5173*
 
-2.  **Start the Backend:**
-    (Instructions for running the backend service - assuming a main entry point exists or will be created)
-    ```bash
-    cd backend
-    python main.py # (or appropriate entry file)
-    ```
+3.  **Update Benchmarks:**
+    - Go to the **Leaderboard** page.
+    - Click **Refresh Prices** to trigger the background scraping routine for staple items.
 
 ## Contributing
 
