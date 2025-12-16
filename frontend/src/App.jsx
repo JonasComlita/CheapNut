@@ -1,7 +1,39 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react-router-dom';
 import LeaderboardPage from './pages/LeaderboardPage';
 import ValueCalculator from './pages/ValueCalculator';
+
+function NavLink({ to, children }) {
+    const location = useLocation();
+    const isActive = location.pathname === to;
+
+    return (
+        <Link
+            to={to}
+            className={`nav-link ${isActive ? 'active' : ''}`}
+        >
+            {children}
+        </Link>
+    );
+}
+
+function Navigation() {
+    return (
+        <nav className="nav-container">
+            <div className="nav-inner">
+                <Link to="/" className="nav-logo">
+                    <img src="/logo.png" alt="CheapNut Logo" style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-md)' }} />
+                    CheapNut
+                </Link>
+                <div className="nav-links">
+                    <NavLink to="/">Search</NavLink>
+                    <NavLink to="/leaderboard">Leaderboard</NavLink>
+                    <NavLink to="/calculator">Calculator</NavLink>
+                </div>
+            </div>
+        </nav>
+    );
+}
 
 function Home() {
     const [query, setQuery] = useState('');
@@ -24,58 +56,145 @@ function Home() {
 
     return (
         <div className="app-container">
-            <h1 className="text-4xl font-bold text-center mb-4 text-slate-800">CheapNut</h1>
-            <p className="text-center text-slate-600 mb-8">Compare cost and nutrition of home cooking vs fast food.</p>
+            {/* Hero Section */}
+            <div className="hero">
+                <div className="hero-content">
+                    <h1 className="animate-fade-in-up">🥜 CheapNut</h1>
+                    <p className="animate-fade-in-up stagger-1">
+                        Discover the true cost of your food choices. Compare grocery prices with fast food and make smarter decisions for your wallet and health.
+                    </p>
 
-            <form className="search-box max-w-xl mx-auto flex gap-2 mb-8" onSubmit={handleSearch}>
-                <input
-                    type="text"
-                    className="flex-1 p-3 border rounded shadow-sm"
-                    placeholder="Enter food item (e.g. chicken, beans)"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                />
-                <button type="submit" disabled={loading} className="bg-blue-600 text-white px-6 rounded font-bold">
-                    {loading ? 'Searching...' : 'Search'}
-                </button>
-            </form>
+                    <form className="search-box animate-fade-in-up stagger-2" onSubmit={handleSearch}>
+                        <input
+                            type="text"
+                            className="input input-lg"
+                            placeholder="Search for any food (e.g. chicken, beans, rice)..."
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                        />
+                        <button type="submit" disabled={loading} className="btn btn-primary">
+                            {loading ? (
+                                <>
+                                    <span className="animate-pulse">⏳</span>
+                                    Searching...
+                                </>
+                            ) : (
+                                <>
+                                    🔍 Search
+                                </>
+                            )}
+                        </button>
+                    </form>
+                </div>
+            </div>
 
+            {/* Results */}
             {results && (
-                <div className="results-container opacity-100 transition-opacity duration-500">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="column">
-                            <h2 className="text-2xl font-bold mb-4 text-green-700">Grocery Alternatives</h2>
-                            {results.grocery.length === 0 ? <p>No results found.</p> :
-                                results.grocery.map((item, index) => (
-                                    <div key={index} className="bg-white p-4 rounded shadow mb-4">
-                                        <h3 className="font-bold text-lg">{item.name}</h3>
-                                        <div className="text-green-600 font-bold">${item.price.toFixed(2)} / {item.unit}</div>
-                                        <p className="text-sm text-slate-500">Store: {item.store}</p>
-                                        <div className="mt-2 text-xs bg-slate-100 p-2 rounded">
-                                            <strong>Nutrition:</strong>
-                                            <pre>{JSON.stringify(item.nutrition, null, 2)}</pre>
+                <div className="results-container animate-fade-in-up">
+                    <div className="column">
+                        <h2 className="grocery-title">
+                            <span>🥬</span>
+                            Grocery Alternatives
+                        </h2>
+                        {results.grocery.length === 0 ? (
+                            <div className="card">
+                                <p style={{ textAlign: 'center', color: 'var(--slate-500)' }}>
+                                    No grocery items found matching your search.
+                                </p>
+                            </div>
+                        ) : (
+                            results.grocery.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="result-card animate-fade-in-up"
+                                    style={{ animationDelay: `${index * 0.1}s` }}
+                                >
+                                    <div className="result-card-header">
+                                        <h3 className="result-card-title">{item.name}</h3>
+                                        <div className="result-card-price grocery">
+                                            ${item.price.toFixed(2)}
+                                            <span style={{ fontSize: '0.875rem', fontWeight: '400', color: 'var(--slate-500)' }}>
+                                                /{item.unit}
+                                            </span>
                                         </div>
                                     </div>
-                                ))
-                            }
-                        </div>
+                                    <div className="result-card-store">
+                                        <span className="badge badge-success">{item.store}</span>
+                                    </div>
+                                    <div className="nutrition-grid">
+                                        <div className="nutrition-item">
+                                            <span className="nutrition-label">Calories</span>
+                                            <span className="nutrition-value">{item.nutrition?.calories || '—'}</span>
+                                        </div>
+                                        <div className="nutrition-item">
+                                            <span className="nutrition-label">Protein</span>
+                                            <span className="nutrition-value">{item.nutrition?.protein || '—'}g</span>
+                                        </div>
+                                        <div className="nutrition-item">
+                                            <span className="nutrition-label">Carbs</span>
+                                            <span className="nutrition-value">{item.nutrition?.carbs || '—'}g</span>
+                                        </div>
+                                        <div className="nutrition-item">
+                                            <span className="nutrition-label">Fat</span>
+                                            <span className="nutrition-value">{item.nutrition?.fat || '—'}g</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
 
-                        <div className="column">
-                            <h2 className="text-2xl font-bold mb-4 text-red-700">Fast Food / Restaurant</h2>
-                            {results.fastfood.length === 0 ? <p>No results found.</p> :
-                                results.fastfood.map((item, index) => (
-                                    <div key={index} className="bg-white p-4 rounded shadow mb-4">
-                                        <h3 className="font-bold text-lg">{item.name}</h3>
-                                        <div className="text-red-600 font-bold">${item.price.toFixed(2)} / {item.unit}</div>
-                                        <p className="text-sm text-slate-500">Store: {item.store}</p>
-                                        <div className="mt-2 text-xs bg-slate-100 p-2 rounded">
-                                            <strong>Nutrition:</strong>
-                                            <pre>{JSON.stringify(item.nutrition, null, 2)}</pre>
+                    <div className="column">
+                        <h2 className="fastfood-title">
+                            <span>🍔</span>
+                            Fast Food / Restaurant
+                        </h2>
+                        {results.fastfood.length === 0 ? (
+                            <div className="card">
+                                <p style={{ textAlign: 'center', color: 'var(--slate-500)' }}>
+                                    No fast food items found matching your search.
+                                </p>
+                            </div>
+                        ) : (
+                            results.fastfood.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="result-card animate-fade-in-up"
+                                    style={{ animationDelay: `${index * 0.1}s` }}
+                                >
+                                    <div className="result-card-header">
+                                        <h3 className="result-card-title">{item.name}</h3>
+                                        <div className="result-card-price fastfood">
+                                            ${item.price.toFixed(2)}
+                                            <span style={{ fontSize: '0.875rem', fontWeight: '400', color: 'var(--slate-500)' }}>
+                                                /{item.unit}
+                                            </span>
                                         </div>
                                     </div>
-                                ))
-                            }
-                        </div>
+                                    <div className="result-card-store">
+                                        <span className="badge badge-danger">{item.store}</span>
+                                    </div>
+                                    <div className="nutrition-grid">
+                                        <div className="nutrition-item">
+                                            <span className="nutrition-label">Calories</span>
+                                            <span className="nutrition-value">{item.nutrition?.calories || '—'}</span>
+                                        </div>
+                                        <div className="nutrition-item">
+                                            <span className="nutrition-label">Protein</span>
+                                            <span className="nutrition-value">{item.nutrition?.protein || '—'}g</span>
+                                        </div>
+                                        <div className="nutrition-item">
+                                            <span className="nutrition-label">Carbs</span>
+                                            <span className="nutrition-value">{item.nutrition?.carbs || '—'}g</span>
+                                        </div>
+                                        <div className="nutrition-item">
+                                            <span className="nutrition-label">Fat</span>
+                                            <span className="nutrition-value">{item.nutrition?.fat || '—'}g</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             )}
@@ -86,28 +205,22 @@ function Home() {
 function App() {
     return (
         <Router>
-            <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-                <nav className="bg-white shadow p-4 mb-8">
-                    <div className="container mx-auto flex justify-between items-center">
-                        <Link to="/" className="text-xl font-bold text-blue-600 flex items-center gap-2">
-                            <img src="/logo.png" alt="CheapNut Logo" className="h-8 w-8 object-contain" onError={(e) => e.target.style.display = 'none'} />
-                            CheapNut
-                        </Link>
-                        <div className="space-x-6">
-                            <Link to="/" className="hover:text-blue-600 font-medium">Search</Link>
-                            <Link to="/leaderboard" className="hover:text-blue-600 font-medium">Leaderboard</Link>
-                            <Link to="/calculator" className="hover:text-blue-600 font-medium">Value Calculator</Link>
-                        </div>
-                    </div>
-                </nav>
+            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+                <Navigation />
 
-                <div className="container mx-auto px-4 pb-12">
+                <main style={{ flex: 1 }}>
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/leaderboard" element={<LeaderboardPage />} />
                         <Route path="/calculator" element={<ValueCalculator />} />
                     </Routes>
-                </div>
+                </main>
+
+                <footer className="footer">
+                    <p>
+                        🥜 <strong>CheapNut</strong> — Making smart food choices easier, one comparison at a time.
+                    </p>
+                </footer>
             </div>
         </Router>
     );
